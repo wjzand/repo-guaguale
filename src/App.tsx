@@ -7,6 +7,8 @@ import { RankPage } from '@/pages/RankPage';
 import { ProfilePage } from '@/pages/ProfilePage';
 import { AncientMinePage } from '@/pages/AncientMinePage';
 import { AncientRunPage } from '@/pages/AncientRunPage';
+import { BossCodexPage } from '@/pages/BossCodexPage';
+import { MedalPage } from '@/pages/MedalPage';
 import { useGameStore } from '@/store/useGameStore';
 import { Gift } from 'lucide-react';
 
@@ -40,6 +42,8 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/ancient" element={<AncientMinePage />} />
           <Route path="/ancient/run" element={<AncientRunPage />} />
+          <Route path="/ancient/boss" element={<BossCodexPage />} />
+          <Route path="/ancient/medals" element={<MedalPage />} />
         </Routes>
         
         <TabNavWrapper />
