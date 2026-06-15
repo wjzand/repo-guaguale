@@ -455,6 +455,31 @@ export const useGameStore = create<GameStore>()(
         return { leveledUp: false };
       },
 
+      addOre: (oreId: string, count: number) => {
+        const state = get();
+        
+        set((state) => {
+          const existing = state.ores.find(o => o.oreId === oreId);
+          let newOres: PlayerOre[];
+          
+          if (existing) {
+            newOres = state.ores.map(o => 
+              o.oreId === oreId ? { ...o, count: o.count + count } : o
+            );
+          } else {
+            newOres = [...state.ores, {
+              oreId,
+              count,
+              firstObtained: getTodayString(),
+            }];
+          }
+          
+          return { ores: newOres };
+        });
+        
+        get().checkAchievements();
+      },
+
       unlockAchievement: (id: string) => {
         const state = get();
         if (state.achievements.includes(id)) return false;

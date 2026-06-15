@@ -1,12 +1,20 @@
 import { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { BottomTabNav } from '@/components/BottomTabNav';
 import { MinePage } from '@/pages/MinePage';
 import { CollectionPage } from '@/pages/CollectionPage';
 import { RankPage } from '@/pages/RankPage';
 import { ProfilePage } from '@/pages/ProfilePage';
+import { AncientMinePage } from '@/pages/AncientMinePage';
+import { AncientRunPage } from '@/pages/AncientRunPage';
 import { useGameStore } from '@/store/useGameStore';
 import { Gift } from 'lucide-react';
+
+const TabNavWrapper = () => {
+  const location = useLocation();
+  const showTabNav = !location.pathname.startsWith('/ancient');
+  return showTabNav ? <BottomTabNav /> : null;
+};
 
 function App() {
   const { checkDailyReset, lastLoginDate, addDailyBonus } = useGameStore();
@@ -30,9 +38,11 @@ function App() {
           <Route path="/collection" element={<CollectionPage />} />
           <Route path="/rank" element={<RankPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/ancient" element={<AncientMinePage />} />
+          <Route path="/ancient/run" element={<AncientRunPage />} />
         </Routes>
         
-        <BottomTabNav />
+        <TabNavWrapper />
       </div>
 
       {/* 每日登录奖励弹窗 */}

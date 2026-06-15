@@ -133,6 +133,7 @@ export interface GameActions {
   resetDailyIfNeeded: () => void;
   checkDailyReset: () => void;
   addDailyBonus: () => void;
+  addOre: (oreId: string, count: number) => void;
   getOreById: (id: string) => Ore | undefined;
   getPlayerOre: (oreId: string) => PlayerOre | undefined;
   getCurrentLevelInfo: () => MinerLevel;
@@ -144,3 +145,171 @@ export interface GameActions {
 export type GameStore = GameState & GameActions;
 
 export type TabType = 'mine' | 'collection' | 'rank' | 'profile';
+
+// ============ 远古矿脉相关类型 ============
+
+export type RoomType = 'camp' | 'battle' | 'treasure' | 'event' | 'rest' | 'boss' | 'unknown';
+
+export type MineThemeType = 'magma' | 'ice' | 'poison' | 'crystal' | 'ancient';
+
+export interface MineTheme {
+  id: MineThemeType;
+  name: string;
+  description: string;
+  emoji: string;
+  unlockLevel: number;
+  bgColor: string;
+  color: string;
+  bossId: string;
+  difficulty: number;
+}
+
+export interface MineRoom {
+  id: string;
+  type: RoomType;
+  x: number;
+  y: number;
+  layer: number;
+  connections: string[];
+  visited: boolean;
+  cleared: boolean;
+  revealed: boolean;
+  eventId?: string;
+  enemyId?: string;
+  reward?: MineRoomReward;
+  battleState?: BattleState;
+  event?: MineEvent;
+  restoredHp?: number;
+}
+
+export interface MineRoomReward {
+  ores?: { oreId: string; count: number }[];
+  fragments?: number;
+  ancientFragments?: number;
+  items?: { type: string; count: number }[];
+  attackBonus?: number;
+  hp?: number;
+}
+
+export interface MineBoss {
+  id: string;
+  name: string;
+  emoji: string;
+  maxHp: number;
+  shield: number;
+  theme: MineThemeType;
+  skills: BossSkill[];
+  rewards: MineRoomReward;
+}
+
+export interface BossSkill {
+  id: string;
+  name: string;
+  description: string;
+  damage: number;
+  cooldown: number;
+  effect?: 'heal' | 'shield' | 'obscure' | 'thicken';
+}
+
+export interface MineEvent {
+  id: string;
+  name: string;
+  title: string;
+  description: string;
+  emoji: string;
+  icon: string;
+  choices: EventChoice[];
+}
+
+export interface EventChoice {
+  id: string;
+  text: string;
+  description: string;
+  cost?: { hp?: number; ancientFragments?: number };
+  reward?: MineRoomReward;
+  successRate?: number;
+}
+
+export interface BattleState {
+  enemyHp: number;
+  enemyMaxHp: number;
+  enemyShield: number;
+  playerTurns: number;
+  maxTurns: number;
+  isBoss: boolean;
+  bossSkillCooldown: number;
+  critZones: { x: number; y: number; radius: number; hit: boolean }[];
+  totalDamage: number;
+  isVictory?: boolean;
+}
+
+export interface ShopItem {
+  id: string;
+  name: string;
+  description: string;
+  emoji: string;
+  icon: string;
+  price: number;
+  type: 'heal' | 'attack' | 'shield' | 'bomb' | 'precision' | 'skip';
+  effect: { value: number };
+  stock: number;
+  purchased?: boolean;
+}
+
+export interface AncientRunState {
+  mineType: MineThemeType;
+  rooms: MineRoom[];
+  currentRoomId: string;
+  hp: number;
+  maxHp: number;
+  ancientFragments: number;
+  attackBonus: number;
+  critBonus: number;
+  shield: number;
+  bombs: number;
+  oresCollected: { oreId: string; count: number }[];
+  itemsCollected: { type: string; count: number }[];
+  battleState?: BattleState;
+  shopItems?: ShopItem[];
+  currentEvent?: MineEvent;
+  isFinished: boolean;
+  victory: boolean;
+  startTime: number;
+}
+
+export interface RunResult {
+  victory: boolean;
+  oresCollected: { oreId: string; count: number }[];
+  fragments: number;
+  expGained: number;
+  newMedals: string[];
+}
+
+export interface AncientMineState {
+  tickets: number;
+  todayTicketDate: string;
+  bossKills: Record<string, number>;
+  bestTime: Record<string, number>;
+  seasonScore: number;
+  seasonDate: string;
+  bossPets: string[];
+  medals: string[];
+  currentRun: AncientRunState | null;
+  lastRunResult: RunResult | null;
+}
+
+export interface AncientMineActions {
+  getAncientTickets: () => number;
+  claimDailyTicket: () => boolean;
+  startAncientRun: (mineType: MineThemeType) => boolean;
+  enterRoom: (roomId: string) => boolean;
+  doBattleTurn: (damage: number, critHit: boolean) => { victory: boolean; damage: number; enemyTurn?: boolean };
+  useBattleBomb: () => number;
+  makeEventChoice: (choiceId: string) => { success: boolean; message: string; reward?: any };
+  buyShopItem: (itemId: string) => boolean;
+  finishRun: (victory: boolean) => { ores: any[]; fragments: any; ancientFragments: number };
+  abandonRun: () => void;
+  getMedals: () => string[];
+}
+
+export type FullGameStore = GameStore & { ancientMine: AncientMineState } & AncientMineActions;

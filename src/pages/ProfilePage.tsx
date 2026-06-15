@@ -1,14 +1,17 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '@/store/useGameStore';
+import { useAncientMineStore } from '@/store/useAncientMineStore';
 import { ACHIEVEMENTS } from '@/data/achievements';
 import { ORES, getOresByRarity } from '@/data/ores';
 import { OreCard } from '@/components/OreCard';
 import type { Ore, OreRarity } from '@/types';
-import { Settings, Flame, Trophy, Users, Package, X, Gift, Swords, ChevronRight } from 'lucide-react';
+import { Settings, Flame, Trophy, Users, Package, X, Gift, Swords, ChevronRight, Mountain } from 'lucide-react';
 
 type TabType = 'smelt' | 'achievements' | 'friends' | 'items';
 
 export const ProfilePage = () => {
+  const navigate = useNavigate();
   const {
     level,
     exp,
@@ -28,6 +31,8 @@ export const ProfilePage = () => {
     stealFromFriend,
     giveGift,
   } = useGameStore();
+
+  const { tickets, medals, currentRun } = useAncientMineStore();
 
   const [activeTab, setActiveTab] = useState<TabType>('smelt');
   const [selectedRarity, setSelectedRarity] = useState<OreRarity>('normal');
@@ -191,6 +196,33 @@ export const ProfilePage = () => {
                 <div className="text-gray-400 text-xs">成就数</div>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* 远古矿脉入口 */}
+        <div 
+          className="card-mine mb-4 cursor-pointer hover:border-mine-gold transition-colors"
+          onClick={() => navigate('/ancient')}
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-700 to-amber-900 flex items-center justify-center text-3xl border-2 border-amber-500/50">
+              🏔️
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-bold text-white">远古矿脉</h3>
+                <span className="px-2 py-0.5 bg-red-500/20 text-red-400 text-xs rounded-full">
+                  新玩法
+                </span>
+              </div>
+              <p className="text-sm text-gray-400">Roguelite探索模式</p>
+              <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                <span>🎫 门票 ×{tickets}</span>
+                <span>🏅 勋章 {medals.length}</span>
+                {currentRun && <span className="text-mine-gold">进行中</span>}
+              </div>
+            </div>
+            <ChevronRight size={24} className="text-gray-500" />
           </div>
         </div>
 
